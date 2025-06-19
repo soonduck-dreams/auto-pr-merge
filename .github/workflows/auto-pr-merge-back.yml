@@ -3,9 +3,9 @@ name: Sync main → develop
 
 on:
   pull_request:
-  types: [ closed ]
-  branches:
-    - main            # main 브랜치에 PR이 닫힐 때
+    types: [ closed ]
+    branches:
+      - main            # main 브랜치에 PR이 닫힐 때
 
 permissions:
   contents: write             # PR 생성·머지에 필요
