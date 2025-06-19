@@ -1,0 +1,52 @@
+# .github/workflows/main-to-develop-sync.yml
+name: Sync main → develop
+
+on:
+  push:
+    branches: [ main ]        # main 에 새 커밋이 올라갈 때마다 실행
+
+permissions:
+  contents: write             # PR 생성·머지에 필요
+  pull-requests: write        # "
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout (develop base)
+        uses: actions/checkout@v4
+        with:
+          ref: develop        # develop 을 기준으로 체크아웃
+          fetch-depth: 0      # 모든 커밋 기록을 가져옴
+
+      - name: Merge main into develop
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git merge --no-ff --no-edit origin/main
+
+      - name: Create PR main → develop
+        id: cpr
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GH_TOKEN }}   # repo-scope PAT
+          base: develop
+          branch: sync/main-to-develop     # 임시 브랜치
+          title: chore: sync main into develop
+          body: |
+            자동 동기화 PR  
+            (main 에서 develop 으로 변경 사항 병합)
+          commit-message: chore: sync main into develop
+          delete-branch: true              # 머지 후 자동 삭제
+          squash: false                    # 머지 커밋 방식으로 남김
+
+      - name: Auto-merge PR
+        if: steps.cpr.outputs.pull-request-number != ''
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          pr_number="${{ steps.cpr.outputs.pull-request-number }}"
+          # 필수 검사(워크플로우, 리뷰 등)가 끝나면 자동 머지
+          gh pr merge "$pr_number" --merge --auto --delete-branch
