@@ -34,11 +34,11 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}   # repo-scope PAT
           base: develop
           branch: sync/main-to-develop     # 임시 브랜치
-          title: chore: sync main into develop
+          title: "chore: sync main into develop"
           body: |
             자동 동기화 PR  
             (main 에서 develop 으로 변경 사항 병합)
-          commit-message: chore: sync main into develop
+          commit-message: "chore: sync main into develop"
           delete-branch: true              # 머지 후 자동 삭제
           squash: false                    # 머지 커밋 방식으로 남김
 
