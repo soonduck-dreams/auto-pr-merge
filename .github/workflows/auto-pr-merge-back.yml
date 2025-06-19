@@ -2,8 +2,10 @@
 name: Sync main → develop
 
 on:
-  push:
-    branches: [ main ]        # main 에 새 커밋이 올라갈 때마다 실행
+  pull_request:
+  types: [ closed ]
+  branches:
+    - main            # main 브랜치에 PR이 닫힐 때
 
 permissions:
   contents: write             # PR 생성·머지에 필요
@@ -12,6 +14,11 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
+
+    # 조건: PR이 머지되었고, develop 브랜치으로부터의 PR merge가 아닌 경우
+    if: >
+      github.event.pull_request.merged == true &&
+      github.event.pull_request.head.ref != 'develop'
 
     steps:
       - name: Checkout (develop base)
