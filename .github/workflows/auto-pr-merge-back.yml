@@ -15,7 +15,7 @@ jobs:
 
     steps:
       - name: Checkout (develop base)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
         with:
           ref: develop        # develop 을 기준으로 체크아웃
           fetch-depth: 0      # 모든 커밋 기록을 가져옴
@@ -34,13 +34,12 @@ jobs:
           token: ${{ secrets.GH_TOKEN }}   # repo-scope PAT
           base: develop
           branch: sync/main-to-develop     # 임시 브랜치
-          title: "chore: sync main into develop"
+          title: "chore: main → develop 자동 merge back"
           body: |
             자동 동기화 PR  
             (main 에서 develop 으로 변경 사항 병합)
           commit-message: "chore: sync main into develop"
           delete-branch: true              # 머지 후 자동 삭제
-          squash: false                    # 머지 커밋 방식으로 남김
 
       - name: Auto-merge PR
         if: steps.cpr.outputs.pull-request-number != ''
